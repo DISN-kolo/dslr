@@ -15,7 +15,20 @@ def describe_necessary_cols(df, unquantifiable):
     for col in df.columns:
         if (col in unquantifiable):
             continue
-        print(col)
+        col_data = df[col]
+        count = ft_count(col_data)
+        mean = ft_mean(col_data, count)
+        std = ft_std(col_data, count, mean)
+#        our_min = ft_min(col_data)
+#        our_max = ft_min(col_data)
+        sorted_col_data = ft_merge_sort(col_data, 0, count - 1)
+        our_min = sorted_col_data[0]
+        our_max = sorted_col_data[-1]
+        perc25 = ft_percentile(sorted_col_data, count, our_min, our_max, .25)
+        perc50 = ft_percentile(sorted_col_data, count, our_min, our_max, .50)
+        perc75 = ft_percentile(sorted_col_data, count, our_min, our_max, .75)
+        print(col, count, mean, std, our_min, perc25, perc50, perc75, our_max,
+                sep="\n")
 
 if __name__=="__main__":
     if (len(sys.argv) != 2):

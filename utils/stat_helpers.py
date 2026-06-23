@@ -16,15 +16,13 @@ def ft_count(it):
         ctr += 1
     return ctr
 
-def ft_mean(it):
-    count = ft_count(it)
-
-    if (count == 0):
-        raise ZeroElementsError
+def ft_mean(it, ctr: int):
+    if (ctr < 1):
+        raise LessThanOneElError
 
     m: float = 0.0
     for element in it:
-        m += element/count
+        m += element/ctr
 
     return m
 
@@ -121,7 +119,7 @@ def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
         raise LessThanOneElError
 
     p_ctr = 0
-    ctr_max = math.ceil(p*ctr)
+    ctr_max = math.ceil(p*(ctr - 1))
     p_elem = s_it[0]
     for element in s_it:
         if (p_ctr > ctr_max):
