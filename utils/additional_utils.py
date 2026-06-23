@@ -1,5 +1,6 @@
 import sys
 from utils.additional_exceptions import *
+import pandas as pd
 
 def exit_with_print(code: int = 1, message: str = ""):
     sys.stderr.write(message + "\n")
@@ -21,4 +22,4 @@ def exit_by_exception(exc: Exception, message: str = ""):
     if isinstance(exc, pd.errors.EmptyDataError):
         exit_with_print(8, "Data turned up empty according to pandas")
     if isinstance(exc, Exception):
-        exit_with_print(9, "Some error occured")
+        exit_with_print(9, "Some error occured: " + str(exc))

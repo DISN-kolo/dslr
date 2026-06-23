@@ -12,7 +12,7 @@ def ft_count(it):
         raise ItsNoneError
 
     ctr: int = 0
-    for (element in it):
+    for element in it:
         ctr += 1
     return ctr
 
@@ -23,7 +23,7 @@ def ft_mean(it):
         raise ZeroElementsError
 
     m: float = 0.0
-    for (element in it):
+    for element in it:
         m += element/count
 
     return m
@@ -33,7 +33,7 @@ def ft_sum(it):
         raise ItsNoneError
 
     s: float = 0
-    for (element in it):
+    for element in it:
         s += element
 
     return s
@@ -57,7 +57,7 @@ def ft_min(it):
         raise ItsNoneError
 
     m = it[0]
-    for (element in it):
+    for element in it:
         if (element < m):
             m = element
 
@@ -68,7 +68,7 @@ def ft_max(it):
         raise ItsNoneError
 
     m = it[0]
-    for (element in it):
+    for element in it:
         if (element > m):
             m = element
 
@@ -81,9 +81,9 @@ def ft_merge(it, l: int, m: int, r: int):
     l_it = np.zeros(l_len)
     r_it = np.zeros(r_len)
 
-    for (i in range(l_len)):
+    for i in range(l_len):
         l_it[i] = it[l + i]
-    for (j in range(r_len)):
+    for j in range(r_len):
         r_it[j] = it[m + 1 + j]
 
     i = j = 0
@@ -123,7 +123,7 @@ def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
     p_ctr = 0
     ctr_max = math.ceil(p*ctr)
     p_elem = s_it[0]
-    for (element in s_it):
+    for element in s_it:
         if (p_ctr > ctr_max):
             p_elem = element
             break
