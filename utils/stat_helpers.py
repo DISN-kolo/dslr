@@ -23,6 +23,7 @@ def ft_mean(it, ctr: int):
     m: float = 0.0
     for element in it:
         m += element/ctr
+        print(f"m: {m:10.5f}; element: {element:10.5f}")
 
     return m
 
@@ -111,6 +112,7 @@ def ft_merge_sort(it, l: int, r: int):
         ft_merge_sort(it, l, m)
         ft_merge_sort(it, m + 1, r)
         ft_merge(it, l, m, r)
+    return it
 
 def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
     if (s_it is None):

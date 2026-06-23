@@ -21,7 +21,8 @@ def describe_necessary_cols(df, unquantifiable):
         std = ft_std(col_data, count, mean)
 #        our_min = ft_min(col_data)
 #        our_max = ft_min(col_data)
-        sorted_col_data = ft_merge_sort(col_data, 0, count - 1)
+        sorted_col_data = col_data.copy()
+        sorted_col_data = ft_merge_sort(sorted_col_data, 0, count - 1)
         our_min = sorted_col_data[0]
         our_max = sorted_col_data[-1]
         perc25 = ft_percentile(sorted_col_data, count, our_min, our_max, .25)
