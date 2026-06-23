@@ -9,10 +9,12 @@ import utils.additional_exceptions
 from utils.additional_utils import exit_with_print, exit_by_exception
 from utils.stat_helpers import *
 
-def describe_necessary_cols(df):
+def describe_necessary_cols(df, unquantifiable):
     if (df is None):
         raise DfNoneError
     for col in df.columns:
+        if (col in unquantifiable):
+            continue
         print(col)
 
 if __name__=="__main__":
@@ -21,6 +23,13 @@ if __name__=="__main__":
     try:
         df = read_or_raise(sys.argv[1])
         print(df)
-        describe_necessary_cols(df)
+        describe_necessary_cols(df, [
+            "Index",
+            "Hogwarts House",
+            "First Name",
+            "Last Name",
+            "Birthday",
+            "Best Hand",
+        ])
     except Exception as exc:
         exit_by_exception(exc, sys.argv[1])
