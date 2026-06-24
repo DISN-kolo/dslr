@@ -23,8 +23,6 @@ def ft_mean(it, ctr: int):
     m: float = 0.0
     for element in it:
         m += element/ctr
-        print(f"m: {m:10.5f}; element: {element:10.5f}")
-
     return m
 
 def ft_sum(it):
@@ -129,3 +127,16 @@ def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
             break
         p_ctr += 1
     return p_elem
+
+def anti_nan(it):
+    if (it is None):
+        raise ItsNoneError
+
+    nan_positions = []
+    old_index = 0
+    for element in it:
+        if (math.isnan(element)):
+            nan_positions.append(old_index)
+        old_index += 1
+    it = np.delete(it, nan_positions)
+    return nan_positions, it

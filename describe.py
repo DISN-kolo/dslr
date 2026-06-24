@@ -15,7 +15,8 @@ def describe_necessary_cols(df, unquantifiable):
     for col in df.columns:
         if (col in unquantifiable):
             continue
-        col_data = df[col]
+        col_data = df[col].copy().to_numpy()
+        nanned_stuff, col_data = anti_nan(col_data)
         count = ft_count(col_data)
         mean = ft_mean(col_data, count)
         std = ft_std(col_data, count, mean)
