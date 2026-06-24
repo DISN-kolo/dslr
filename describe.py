@@ -6,15 +6,31 @@ import sys
 
 from utils.csv_reading import read_or_raise
 import utils.additional_exceptions
-from utils.additional_utils import exit_with_print, exit_by_exception
+from utils.additional_utils import (
+    exit_with_print,
+    exit_by_exception,
+    ft_pretty_table_print,
+)
 from utils.stat_helpers import *
 
 def describe_necessary_cols(df, unquantifiable):
     if (df is None):
         raise DfNoneError
+    final_table = {
+        "Names": [],
+        "Count": [],
+        "Mean": [],
+        "Std": [],
+        "Min": [],
+        "25%": [],
+        "50%": [],
+        "75%": [],
+        "Max": [],
+    }
     for col in df.columns:
         if (col in unquantifiable):
             continue
+        final_table["Names"].append(col)
         col_data = df[col].copy().to_numpy()
         nanned_stuff, col_data = anti_nan(col_data)
         count = ft_count(col_data)
@@ -29,15 +45,21 @@ def describe_necessary_cols(df, unquantifiable):
         perc25 = ft_percentile(sorted_col_data, count, our_min, our_max, .25)
         perc50 = ft_percentile(sorted_col_data, count, our_min, our_max, .50)
         perc75 = ft_percentile(sorted_col_data, count, our_min, our_max, .75)
-        print(col, count, mean, std, our_min, perc25, perc50, perc75, our_max,
-                sep="\n")
+        final_table["Count"].append(count)
+        final_table["Mean"].append(mean)
+        final_table["Std"].append(std)
+        final_table["Min"].append(our_min)
+        final_table["25%"].append(perc25)
+        final_table["50%"].append(perc50)
+        final_table["75%"].append(perc75)
+        final_table["Max"].append(our_max)
+    ft_pretty_table_print(final_table, 15)
 
 if __name__=="__main__":
     if (len(sys.argv) != 2):
         exit_with_print(1, f"Usage: {sys.argv[0]} <path/to/csv>")
     try:
         df = read_or_raise(sys.argv[1])
-        print(df)
         describe_necessary_cols(df, [
             "Index",
             "Hogwarts House",
@@ -47,4 +69,5 @@ if __name__=="__main__":
             "Best Hand",
         ])
     except Exception as exc:
+        raise exc
         exit_by_exception(exc, sys.argv[1])
