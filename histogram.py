@@ -50,7 +50,6 @@ def draw_histograms_except(df, unquantifiable, houses):
             )
             ctr += 1
         plots[g_ctr // 4, g_ctr % 4].set_title(col)
-        print(f"ping! for g_ctr = {g_ctr:3d}")
         g_ctr += 1
     # FIXME magic number
     while (g_ctr < 16):
