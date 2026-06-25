@@ -69,5 +69,4 @@ if __name__=="__main__":
             "Best Hand",
         ])
     except Exception as exc:
-        raise exc
         exit_by_exception(exc, sys.argv[1])
