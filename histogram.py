@@ -23,6 +23,42 @@ def calc_dimensions(df, unquantifiable):
     y_dim = math.ceil(subj_ctr/x_dim)
     return x_dim, y_dim
 
+def fill_final_grouping(local_houses, houses, col_data):
+    final_grouping = {}
+    for entry in houses:
+        final_grouping[entry] = []
+
+    ctr = 0
+    for entry in local_houses:
+        if (entry in houses):
+            final_grouping[entry].append(col_data[ctr])
+        ctr += 1
+    return final_grouping
+
+def set_up_plots(
+        plots,
+        houses,
+        g_ctr,
+        x_dim,
+        y_dim,
+        final_grouping,
+        col):
+    ctr = 0
+    houses_hatching = "-/\\|"
+    for entry in houses:
+        plots[g_ctr % x_dim, g_ctr // x_dim].hist(
+            final_grouping[entry],
+            alpha=0.5,
+            color=(
+                0.0+ctr*0.2,
+                (0.7+ctr*0.2) % 1.0,
+                1.0-ctr*0.2
+            ),
+            hatch=houses_hatching[ctr],
+            label=entry
+        )
+        ctr += 1
+    plots[g_ctr % x_dim, g_ctr // x_dim].set_title(col)
 #
 # (example + generalization)
 # x_dim = 4, y_dim = 3
@@ -44,33 +80,26 @@ def draw_histograms_except(df, unquantifiable, houses):
     for col in df.columns:
         if (col in unquantifiable):
             continue
+        # initial data structures setup and cleanup.
+        # it might be better to keep everything as dfs since they probably
+        #are more optimized than python loops for filtering data by
+        #value-based criteria
         col_data = df[col].copy().to_numpy()
         nanned_stuff, col_data = anti_nan(col_data)
+
         local_houses = all_houses.copy().drop(index=nanned_stuff)
-        final_grouping = {}
-        for entry in houses:
-            final_grouping[entry] = []
-        ctr = 0
-        for entry in local_houses:
-            if (entry in houses):
-                final_grouping[entry].append(col_data[ctr])
-            ctr += 1
-        ctr = 0
-        houses_hatching = "-/\\|"
-        for entry in houses:
-            plots[g_ctr % x_dim, g_ctr // x_dim].hist(
-                final_grouping[entry],
-                alpha=0.5,
-                color=(
-                    0.0+ctr*0.2,
-                    (0.7+ctr*0.2) % 1.0,
-                    1.0-ctr*0.2
-                ),
-                hatch=houses_hatching[ctr],
-                label=entry
-            )
-            ctr += 1
-        plots[g_ctr % x_dim, g_ctr // x_dim].set_title(col)
+
+        final_grouping = fill_final_grouping(local_houses, houses, col_data)
+
+        set_up_plots(
+            plots,
+            houses,
+            g_ctr,
+            x_dim,
+            y_dim,
+            final_grouping,
+            col
+        )
         g_ctr += 1
     while (g_ctr < x_dim * y_dim):
         fig.delaxes(plots[g_ctr % x_dim, g_ctr // x_dim])
