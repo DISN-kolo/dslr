@@ -23,6 +23,7 @@ def calc_dimensions(df, unquantifiable):
     y_dim = math.ceil(subj_ctr/x_dim)
     return x_dim, y_dim
 
+# breaks down the column data by houses
 def fill_final_grouping(local_houses, houses, col_data):
     final_grouping = {}
     for entry in houses:
@@ -50,9 +51,9 @@ def set_up_plots(
             final_grouping[entry],
             alpha=0.5,
             color=(
-                0.0+ctr*0.2,
+                (0.3+ctr*0.4) % 1.0,
                 (0.7+ctr*0.2) % 1.0,
-                1.0-ctr*0.2
+                (1.5-ctr*0.4) % 1.0
             ),
             hatch=houses_hatching[ctr],
             label=entry
@@ -101,10 +102,13 @@ def draw_histograms_except(df, unquantifiable, houses):
             col
         )
         g_ctr += 1
+
     while (g_ctr < x_dim * y_dim):
         fig.delaxes(plots[g_ctr % x_dim, g_ctr // x_dim])
         g_ctr += 1
-    plt.legend()
+
+    handles, labels = plots[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='outside lower right')
     plt.show()
 
 if __name__=="__main__":
@@ -127,5 +131,4 @@ if __name__=="__main__":
             "Hufflepuff",
         ])
     except Exception as exc:
-        raise exc
         exit_by_exception(exc, sys.argv[1])
