@@ -16,13 +16,38 @@ from utils.stat_helpers import *
 def draw_histograms_except(df, unquantifiable, houses):
     if (df is None):
         raise DfNoneError
+    all_houses = df["Hogwarts House"]
     for col in df.columns:
         if (col in unquantifiable):
             continue
         col_data = df[col].copy().to_numpy()
         nanned_stuff, col_data = anti_nan(col_data)
-        plt.hist(col_data, alpha=0.1)
+        local_houses = all_houses.copy().drop(index=nanned_stuff)
+        final_grouping = {}
+        for entry in houses:
+            final_grouping[entry] = []
+        houses_hatching = "-/\\|"
+        ctr = 0
+        for entry in local_houses:
+            if (entry in houses):
+                final_grouping[entry].append(col_data[ctr])
+            ctr += 1
+        ctr = 0
+        for entry in houses:
+            plt.hist(
+                final_grouping[entry],
+                alpha=0.5,
+                color=(
+                    0.1+ctr*0.1,
+                    0.5,
+                    0.8-ctr*0.1
+                ),
+                hatch=houses_hatching[ctr],
+                label=entry
+            )
+            ctr += 1
         plt.title(col)
+        plt.legend()
         plt.show()
 
 if __name__=="__main__":
