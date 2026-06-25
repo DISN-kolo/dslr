@@ -17,6 +17,9 @@ def draw_histograms_except(df, unquantifiable, houses):
     if (df is None):
         raise DfNoneError
     all_houses = df["Hogwarts House"]
+    # FIXME magic number
+    fig, plots = plt.subplots(4, 4)
+    g_ctr = 0
     for col in df.columns:
         if (col in unquantifiable):
             continue
@@ -26,15 +29,15 @@ def draw_histograms_except(df, unquantifiable, houses):
         final_grouping = {}
         for entry in houses:
             final_grouping[entry] = []
-        houses_hatching = "-/\\|"
         ctr = 0
         for entry in local_houses:
             if (entry in houses):
                 final_grouping[entry].append(col_data[ctr])
             ctr += 1
         ctr = 0
+        houses_hatching = "-/\\|"
         for entry in houses:
-            plt.hist(
+            plots[g_ctr // 4, g_ctr % 4].hist(
                 final_grouping[entry],
                 alpha=0.5,
                 color=(
@@ -46,9 +49,15 @@ def draw_histograms_except(df, unquantifiable, houses):
                 label=entry
             )
             ctr += 1
-        plt.title(col)
-        plt.legend()
-        plt.show()
+        plots[g_ctr // 4, g_ctr % 4].set_title(col)
+        print(f"ping! for g_ctr = {g_ctr:3d}")
+        g_ctr += 1
+    # FIXME magic number
+    while (g_ctr < 16):
+        fig.delaxes(plots[g_ctr // 4, g_ctr % 4])
+        g_ctr += 1
+    plt.legend()
+    plt.show()
 
 if __name__=="__main__":
     if (len(sys.argv) != 2):
