@@ -13,12 +13,33 @@ from utils.additional_utils import (
 )
 from utils.stat_helpers import *
 
+def calc_dimensions(df, unquantifiable):
+    subj_ctr = 0
+    for col in df.columns:
+        if (col in unquantifiable):
+            continue
+        subj_ctr += 1
+    x_dim = math.floor(math.sqrt(subj_ctr))
+    y_dim = math.ceil(subj_ctr/x_dim)
+    return x_dim, y_dim
+
+#
+# (example + generalization)
+# x_dim = 4, y_dim = 3
+# linear = x + y * x_dim => x =  linear - y * x_dim  = linear  % x_dim
+#                           y = (linear - x) / x_dim = linear // x_dim
+#   x--->
+#  y
+#  |  0, 0 | 1, 0 | 2, 0 | 3, 0
+#  v  0, 1 | 1, 1 | 2, 1 | 3, 1
+#     0, 2 | 1, 2 | 2, 2 | 3, 2
+#
 def draw_histograms_except(df, unquantifiable, houses):
     if (df is None):
         raise DfNoneError
     all_houses = df["Hogwarts House"]
-    # FIXME magic number
-    fig, plots = plt.subplots(4, 4)
+    x_dim, y_dim = calc_dimensions(df, unquantifiable)
+    fig, plots = plt.subplots(x_dim, y_dim)
     g_ctr = 0
     for col in df.columns:
         if (col in unquantifiable):
@@ -37,23 +58,22 @@ def draw_histograms_except(df, unquantifiable, houses):
         ctr = 0
         houses_hatching = "-/\\|"
         for entry in houses:
-            plots[g_ctr // 4, g_ctr % 4].hist(
+            plots[g_ctr % x_dim, g_ctr // x_dim].hist(
                 final_grouping[entry],
                 alpha=0.5,
                 color=(
-                    0.1+ctr*0.1,
-                    0.5,
-                    0.8-ctr*0.1
+                    0.0+ctr*0.2,
+                    (0.7+ctr*0.2) % 1.0,
+                    1.0-ctr*0.2
                 ),
                 hatch=houses_hatching[ctr],
                 label=entry
             )
             ctr += 1
-        plots[g_ctr // 4, g_ctr % 4].set_title(col)
+        plots[g_ctr % x_dim, g_ctr // x_dim].set_title(col)
         g_ctr += 1
-    # FIXME magic number
-    while (g_ctr < 16):
-        fig.delaxes(plots[g_ctr // 4, g_ctr % 4])
+    while (g_ctr < x_dim * y_dim):
+        fig.delaxes(plots[g_ctr % x_dim, g_ctr // x_dim])
         g_ctr += 1
     plt.legend()
     plt.show()
