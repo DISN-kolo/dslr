@@ -138,5 +138,5 @@ def anti_nan(it):
         if (math.isnan(element)):
             nan_positions.append(old_index)
         old_index += 1
-    it = np.delete(it, nan_positions)
+    it = it.drop(index=nan_positions)
     return nan_positions, it

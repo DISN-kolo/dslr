@@ -24,18 +24,6 @@ def calc_dimensions(df, unquantifiable):
     return x_dim, y_dim
 
 # breaks down the column data by houses
-def fill_final_grouping(local_houses, houses, col_data):
-    final_grouping = {}
-    for entry in houses:
-        final_grouping[entry] = []
-
-    ctr = 0
-    for entry in local_houses:
-        if (entry in houses):
-            final_grouping[entry].append(col_data[ctr])
-        ctr += 1
-    return final_grouping
-
 def set_up_plots(
         plots,
         houses,
@@ -48,7 +36,7 @@ def set_up_plots(
     houses_hatching = "-/\\|"
     for entry in houses:
         plots[g_ctr % x_dim, g_ctr // x_dim].hist(
-            final_grouping[entry],
+            final_grouping.get_group(entry),
             alpha=0.5,
             color=(
                 (0.3+ctr*0.4) % 1.0,
@@ -81,16 +69,12 @@ def draw_histograms_except(df, unquantifiable, houses):
     for col in df.columns:
         if (col in unquantifiable):
             continue
-        # initial data structures setup and cleanup.
-        # it might be better to keep everything as dfs since they probably
-        #are more optimized than python loops for filtering data by
-        #value-based criteria
-        col_data = df[col].copy().to_numpy()
+        col_data = df[col].copy()
         nanned_stuff, col_data = anti_nan(col_data)
 
         local_houses = all_houses.copy().drop(index=nanned_stuff)
 
-        final_grouping = fill_final_grouping(local_houses, houses, col_data)
+        final_grouping = col_data.groupby(local_houses)
 
         set_up_plots(
             plots,
