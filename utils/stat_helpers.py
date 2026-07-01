@@ -128,7 +128,7 @@ def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
         p_ctr += 1
     return p_elem
 
-def anti_nan(it):
+def just_get_nans(it):
     if (it is None):
         raise ItsNoneError
 
@@ -138,5 +138,9 @@ def anti_nan(it):
         if (math.isnan(element)):
             nan_positions.append(old_index)
         old_index += 1
+    return nan_positions
+
+def anti_nan(it):
+    nan_positions = just_get_nans(it)
     it = it.drop(index=nan_positions)
     return nan_positions, it
