@@ -34,27 +34,57 @@ def draw_pairplots_of(df, fields_to_draw, houses):
 
     index_x = 0
     for field_x in fields_to_draw:
+        col_x_data = df[field_x]
         if (field_x not in all_nans):
             all_nans[field_x] = set(just_get_nans(col_x_data))
+
         nanned_stuff_x = all_nans[field_x]
 
         index_y = 0
         for field_y in fields_to_draw:
+            col_y_data = df[field_y]
             if (index_x < index_y):
                 print("reverse on", index_x, index_y)
                 continue
+
             if (field_x == field_y):
-                draw_histogram()
+                local_houses = all_houses.copy().drop(index=nanned_stuff_x)
+
+                col_data = col_data_x.drop(index=nanned_stuff_x)
+                final_grouping = col_data.groupby(local_houses)
+
+                draw_histogram(
+                    plots[index_x, index_y],
+                    houses,
+                    final_grouping
+                )
                 continue
+
             if (field_y not in all_nans):
                 all_nans[field_y] = set(just_get_nans(col_y_data))
+
             nanned_stuff_y = all_nans[field_y]
             nanned_stuff_xy[index_y][index_x] = nanned_stuff_x.union(
                 nanned_stuff_y
             )
-            draw_scatter_plot()
+            current_pair = df[[field_x, field_y]]
+            current_pair = current_pair.drop(
+                index=nanned_stuff_xy[index_y][index_x]
+            )
+
+            local_houses = all_houses.copy().drop(
+                index=nanned_stuff_xy[index_y][index_x]
+            )
+
+            final_grouping = current_pair.groupby(local_houses)
+            draw_scatter_plot(
+                plots[index_x, index_y],
+                houses,
+                final_grouping
+            )
             index_y += 1
         index_x += 1
+    plt.show()
 
 
 if __name__=="__main__":
