@@ -35,18 +35,26 @@ def draw_pairplots_of(df, fields_to_draw, houses):
     index_x = 0
     for field_x in fields_to_draw:
         if (field_x not in all_nans):
-            all_nans[field_x] = just_get_nans(col_x_data)
-        nanned_stuff_x = set(all_nans[field_x])
+            all_nans[field_x] = set(just_get_nans(col_x_data))
+        nanned_stuff_x = all_nans[field_x]
 
         index_y = 0
         for field_y in fields_to_draw:
+            if (index_x < index_y):
+                print("reverse on", index_x, index_y)
+                continue
             if (field_x == field_y):
                 draw_histogram()
                 continue
             if (field_y not in all_nans):
-                all_nans[field_y] = just_get_nans(col_y_data)
-            nanned_stuff_y = set(all_nans[field_y])
-            nanned_stuff_xy[
+                all_nans[field_y] = set(just_get_nans(col_y_data))
+            nanned_stuff_y = all_nans[field_y]
+            nanned_stuff_xy[index_y][index_x] = nanned_stuff_x.union(
+                nanned_stuff_y
+            )
+            draw_scatter_plot()
+            index_y += 1
+        index_x += 1
 
 
 if __name__=="__main__":
