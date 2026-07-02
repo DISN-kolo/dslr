@@ -47,6 +47,22 @@ def draw_pairplots_of(df, fields_to_draw, houses):
             col_data_x = df[field_x]
             if (index_x < index_y):
                 print("reverse on", index_x, index_y)
+                current_pair = df[[field_x, field_y]]
+                current_pair = current_pair.drop(
+                    index=nanned_stuff_xy[index_x][index_y - index_x]
+                )
+
+                local_houses = all_houses.copy().drop(
+                    index=nanned_stuff_xy[index_x][index_y - index_x]
+                )
+
+                final_grouping = current_pair.groupby(local_houses)
+                print("reverse scatter draw called")
+                draw_scatter_plot(
+                    plots[index_y, index_x],
+                    houses,
+                    final_grouping
+                )
                 index_x += 1
                 continue
 
@@ -56,8 +72,9 @@ def draw_pairplots_of(df, fields_to_draw, houses):
                 col_data = col_data_y.drop(index=nanned_stuff_y)
                 final_grouping = col_data.groupby(local_houses)
 
+                print("histogram draw called")
                 draw_hist(
-                    plots[index_x, index_y],
+                    plots[index_y, index_x],
                     houses,
                     final_grouping
                 )
@@ -83,13 +100,14 @@ def draw_pairplots_of(df, fields_to_draw, houses):
             )
 
             final_grouping = current_pair.groupby(local_houses)
+            print("scatter draw called")
             draw_scatter_plot(
-                plots[index_x, index_y],
+                plots[index_y, index_x],
                 houses,
                 final_grouping
             )
-            index_y += 1
-        index_x += 1
+            index_x += 1
+        index_y += 1
     plt.show()
 
 
@@ -100,10 +118,10 @@ if __name__=="__main__":
         df = read_or_raise(sys.argv[1])
         draw_pairplots_of(df, [
             "Astronomy",
-            "Divination",
-            "History of Magic",
-            "Muggle Studies",
-            "Charms",
+#            "Divination",
+#            "History of Magic",
+#            "Muggle Studies",
+#            "Charms",
             "Ancient Runes",
         ],
         [
