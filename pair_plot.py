@@ -108,6 +108,17 @@ def draw_pairplots_of(df, fields_to_draw, houses):
             )
             index_x += 1
         index_y += 1
+
+    for index, field in enumerate(fields_to_draw):
+        plots[0, index].set_title(field)
+        plots[index, 0].set_ylabel(field)
+
+    for single_plot in plots.flat:
+        single_plot.set_box_aspect(1)
+
+    handles, labels = plots[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='outside lower right')
+    fig.subplots_adjust(top=0.98, bottom=0.02)
     plt.show()
 
 
@@ -118,10 +129,10 @@ if __name__=="__main__":
         df = read_or_raise(sys.argv[1])
         draw_pairplots_of(df, [
             "Astronomy",
-#            "Divination",
-#            "History of Magic",
-#            "Muggle Studies",
-#            "Charms",
+            "Divination",
+            "History of Magic",
+            "Muggle Studies",
+            "Charms",
             "Ancient Runes",
         ],
         [
