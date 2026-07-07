@@ -142,5 +142,4 @@ if __name__=="__main__":
             "Hufflepuff",
         ])
     except Exception as exc:
-        raise exc
         exit_by_exception(exc, sys.argv[1])
