@@ -144,3 +144,15 @@ def anti_nan(it):
     nan_positions = just_get_nans(it)
     it = it.drop(index=nan_positions)
     return nan_positions, it
+
+def just_get_nans_multiple(it):
+    if (it is None):
+        raise ItsNoneError
+    all_nanned_stuff = set()
+    for col in it:
+        all_nanned_stuff = all_nanned_stuff.union(set(just_get_nans(it[col])))
+
+def anti_nan_multiple(it):
+    nan_positions = just_get_nans_multiple(it)
+    it = it.drop(index=nan_positions)
+    return nan_positions, it
