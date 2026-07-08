@@ -150,7 +150,9 @@ def just_get_nans_multiple(it):
         raise ItsNoneError
     all_nanned_stuff = set()
     for col in it:
-        all_nanned_stuff = all_nanned_stuff.union(set(just_get_nans(it[col])))
+        local_nans = just_get_nans(it[col])
+        all_nanned_stuff = all_nanned_stuff.union(set(local_nans))
+    return all_nanned_stuff
 
 def anti_nan_multiple(it):
     nan_positions = just_get_nans_multiple(it)
