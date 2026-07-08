@@ -82,7 +82,7 @@ def run_singular_logreg(y_and_x, m):
             dJ[j] = dJ_dtheta(hs_cached, y, x[col], m)
             j += 1
         theta = theta - eta * dJ
-        print("theta now:", theta)
+#        print("theta now:", theta)
         J_old = J_now
         J_now, hs_cached = J(theta, m, y, x, hs_cached)
         i += 1
@@ -125,7 +125,7 @@ if __name__=="__main__":
             "Astronomy",
             "Divination",
             "History of Magic",
-            "Muggle Studies",
+#            "Muggle Studies",
             "Charms",
             "Ancient Runes",
         ],

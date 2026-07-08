@@ -168,17 +168,23 @@ def normalize_all(df):
         one_max = ft_max(df[col])
         one_min = ft_min(df[col])
 
-        b = one_min
+        abs_difference = abs(one_max - one_min)
+        # [-1..1] 'normalization' seems to help converge a bit faster
+        b = one_min + abs_difference / 2
+#        b = one_min
         df[col] -= b
 
-        abs_difference = abs(one_max - one_min)
+
         # I don't wanna do division if our numbers are all just more or
         #less 0 + some shift (b).
         if (abs_difference > 1e-13):
-            df[col] /= abs_difference
-            a = abs_difference
+#            df[col] /= abs_difference
+#            a = abs_difference
+            df[col] /= 0.5*abs_difference
+            a = 0.5*abs_difference
         else:
             a = 1
         norm_a.append(a)
         norm_b.append(b)
+    print(df)
     return df, norm_a, norm_b
