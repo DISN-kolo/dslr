@@ -29,7 +29,6 @@ def g(z):
     return 1.0 / (1.0 + np.exp(-z))
 
 def h(theta, x):
-    print("I really wanna calculate a dot product of:", theta, x)
     return g(np.dot(theta, x))
 
 # per-axis. 
@@ -39,7 +38,7 @@ def dJ_dtheta(hs_cached, y, xj, m):
         res += (
             (hs_cached[i] - y.iloc[i]
             )
-            * xj.iloc[i]
+            * xj.iloc[i] / m
         )
     return res
 
@@ -76,7 +75,7 @@ def run_singular_logreg(y_and_x, m):
     J_now, hs_cached = J(theta, m, y, x, hs_cached)
     J_old = J_now * 10
     i = 0
-    while (abs(J_old - J_now) > 1e-6 and i < 500):
+    while (abs(J_old - J_now) > 1e-6 and i < 300):
         print(f"Iteration {i:5d}, J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}")
         j = 0
         for col in x:
