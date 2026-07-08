@@ -20,15 +20,16 @@ def J(theta, m, y, x, hs_cached):
         res += (
             (
                 y.iloc[i] * np.log(h_cached)
-                + (1 - y.iloc[i])*np.log(1 - h_cached)
+                + (1.0 - y.iloc[i])*np.log(1.0 - h_cached)
             ) / m
         )
     return res, hs_cached
 
 def g(z):
-    return 1 / (1 + np.exp(-z))
+    return 1.0 / (1.0 + np.exp(-z))
 
 def h(theta, x):
+    print("I really wanna calculate a dot product of:", theta, x)
     return g(np.dot(theta, x))
 
 # per-axis. 
@@ -40,7 +41,7 @@ def dJ_dtheta(hs_cached, y, xj, m):
             )
             * xj.iloc[i]
         )
-    return
+    return res
 
 # returns what is basically
 # { "House_name": df(index: does_it_belong_to_House_name), .. }
@@ -66,7 +67,7 @@ def join_houses_and_cols(house_labels, cols):
 # y_i is the Hogwarts House yes/no 1/0.
 # x_i is the vector of subject scores.
 def run_singular_logreg(y_and_x, m):
-    eta = 1e-10
+    eta = 0.1
     hs_cached = np.zeros(m)
     y = y_and_x.iloc[:, 0]
     x = y_and_x.iloc[:, 1:]
@@ -76,15 +77,18 @@ def run_singular_logreg(y_and_x, m):
     J_old = J_now * 10
     i = 0
     while (abs(J_old - J_now) > 1e-6 and i < 500):
-        print(f"Iteration {i:5d}, J_now: {J_now:16.10g}")
+        print(f"Iteration {i:5d}, J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}")
         j = 0
         for col in x:
             dJ[j] = dJ_dtheta(hs_cached, y, x[col], m)
             j += 1
         theta = theta - eta * dJ
+        print("theta now:", theta)
         J_old = J_now
         J_now, hs_cached = J(theta, m, y, x, hs_cached)
         i += 1
+    print(f"after quiting on {i:5d}, J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}")
+    print("==========================\n\n")
     return theta
 
 def logreg(tables, m):
@@ -110,7 +114,6 @@ def train_with(df, fields_to_use, houses):
 
     joined_tables = join_houses_and_cols(house_labels, cols_normalized)
 
-    print(joined_tables)
     thetas = logreg(joined_tables, m)
     print(thetas)
 
