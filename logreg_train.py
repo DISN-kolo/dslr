@@ -16,12 +16,12 @@ from utils.stat_helpers import *
 def J(theta, m, y, x, hs_cached):
     res = 0
     for i in range(m):
-        h_cached = h(theta, x[i:i+1])
+        h_cached = h(theta, x.iloc[i:i+1])
         hs_cached[i] = h_cached
         res += (
             (
-                y[i] * np.log(h_cached)
-                + (1 - y[i])*np.log(1 - h_cached)
+                y.iloc[i] * np.log(h_cached)
+                + (1 - y.iloc[i])*np.log(1 - h_cached)
             ) / m
         )
     return res, hs_cached
@@ -32,7 +32,15 @@ def g(z):
 def h(theta, x):
     return g(np.dot(theta, x))
 
-def dJ_dtheta(theta, df):
+# per-axis. 
+def dJ_dtheta(hs_cached, y, xj):
+    res = 0
+    for i in range(m):
+        res += (
+            (hs_cached[i] - y.iloc[i]
+            )
+            * xj[i]
+        )
     return
 
 # returns what is basically
@@ -56,21 +64,28 @@ def join_houses_and_cols(house_labels, cols):
     return joined_tables
 
 # reminder:
-# y is the Hogwarts House yes/no 1/0.
-# x is the vector of subject scores.
+# y_i is the Hogwarts House yes/no 1/0.
+# x_i is the vector of subject scores.
 def run_singular_logreg(y_and_x, m):
-    thetas = [0 for theta in y_and_x]
+    eta = 0.1
     hs_cached = [0 for i in range(m)]
     y = y_and_x.iloc[:, 0]
     x = y_and_x.iloc[:, 1:]
+    thetas = [0 for theta in x]
+    dJ = [0 for j in x]
     J_now, hs_cached = J(thetas, m, y, x)
     J_old = J_now * 10
     i = 0
     while (math.abs(J_old - J_now) > 1e-6 and i < 500):
-        print(f"Iteration {i:5d}")
-        dJ_dtheta(theta, df) # HERE
+        print(f"Iteration {i:5d}, J_now: {J_now:10.5g}")
+        j = 0
+        for col in x:
+            dJ[j] = dJ_dtheta(hs_cached, y, x[col])
+            j += 1
+        theta = theta - eta * dJ
         J_old = J_now
         J_now, hs_cached = J(thetas, m, y, x)
+        i += 1
     return thetas
 
 def logreg(tables, m):
@@ -82,6 +97,11 @@ def logreg(tables, m):
 def train_with(df, fields_to_use, houses):
     cols = df[fields_to_use]
     nans, cols_denanned = anti_nan_multiple(cols)
+    m = ft_count(cols_denanned.to_numpy())
+    # x_j for j == 0 is equal to 1 in order to reproduce a
+    # y = theta_0 + theta_1 * x_1 + theta_2 * x_2 ...
+    cols_denanned.insert(0, 'x0', 1)
+
     all_houses = df["Hogwarts House"]
     all_houses = all_houses.drop(index = nans)
 
@@ -89,8 +109,8 @@ def train_with(df, fields_to_use, houses):
 
     joined_tables = join_houses_and_cols(house_labels, cols_denanned)
 
-    m = ft_count(cols_denanned.to_numpy())
     thetas = logreg(joined_tables, m)
+    print(thetas)
 
 if __name__=="__main__":
     if (len(sys.argv) != 2):
