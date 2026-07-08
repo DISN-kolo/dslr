@@ -158,3 +158,27 @@ def anti_nan_multiple(it):
     nan_positions = just_get_nans_multiple(it)
     it = it.drop(index=nan_positions)
     return nan_positions, it
+
+def normalize_all(df):
+    if (df is None):
+        raise ItsNoneError
+    norm_a = []
+    norm_b = []
+    for col in df:
+        one_max = ft_max(df[col])
+        one_min = ft_min(df[col])
+
+        b = one_min
+        df[col] -= b
+
+        abs_difference = abs(one_max - one_min)
+        # I don't wanna do division if our numbers are all just more or
+        #less 0 + some shift (b).
+        if (abs_difference > 1e-13):
+            df[col] /= abs_difference
+            a = abs_difference
+        else:
+            a = 1
+        norm_a.append(a)
+        norm_b.append(b)
+    return df, norm_a, norm_b
