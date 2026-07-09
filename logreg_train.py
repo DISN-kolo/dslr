@@ -100,11 +100,14 @@ def train_with(df, fields_to_use, houses):
     cols = df[fields_to_use]
     nans, cols_denanned = anti_nan_multiple(cols)
     # field = field_normalized * a + b
+    # of course, the x0 = 1 field is not normalized
     cols_normalized, norm_a, norm_b = normalize_all(cols_denanned)
-    m = ft_count(cols_normalized.to_numpy())
+    print(norm_a)
+    print(norm_b)
     # x_j for j == 0 is equal to 1 in order to reproduce a
     # y = theta_0 + theta_1 * x_1 + theta_2 * x_2 ...
     cols_normalized.insert(0, 'x0', 1)
+    m = ft_count(cols_normalized['x0'])
 
     all_houses = df["Hogwarts House"]
     all_houses = all_houses.drop(index = nans)
