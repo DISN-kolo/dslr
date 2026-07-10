@@ -75,8 +75,11 @@ def run_singular_logreg(y_and_x, m):
     J_now, hs_cached = J(theta, m, y, x, hs_cached)
     J_old = J_now * 10
     i = 0
-    while (abs(J_old - J_now) > 1e-6 and i < 300):
-        print(f"Iteration {i:5d}, J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}")
+    while (abs(J_old - J_now) > 1e-6 and i < 10):
+        print(
+            f"Iteration {i:5d}, "\
+            f"J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}"
+        )
         j = 0
         for col in x:
             dJ[j] = dJ_dtheta(hs_cached, y, x[col], m)
@@ -86,7 +89,10 @@ def run_singular_logreg(y_and_x, m):
         J_old = J_now
         J_now, hs_cached = J(theta, m, y, x, hs_cached)
         i += 1
-    print(f"after quiting on {i:5d}, J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}")
+    print(
+        f"after quiting on {i:5d}, "\
+        f"J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}"
+    )
     print("==========================\n\n")
     return theta
 
@@ -96,7 +102,12 @@ def logreg(tables, m):
         thetas[house] = run_singular_logreg(tables[house], m)
     return thetas
 
-def train_with(df, fields_to_use, houses):
+def train_with(
+        df,
+        fields_to_use,
+        houses,
+        thetas_path='thetas.csv',
+        norms_path='norms.csv'):
     cols = df[fields_to_use]
     nans, cols_denanned = anti_nan_multiple(cols)
     # field = field_normalized * a + b
@@ -119,9 +130,31 @@ def train_with(df, fields_to_use, houses):
     thetas = logreg(joined_tables, m)
     print(thetas)
 
+    thetas_df = pd.DataFrame.from_dict(
+        thetas, orient='index', columns=cols_normalized.columns
+    )
+    thetas_df.index.name = 'House'
+    thetas_df.to_csv(thetas_path)
+
+    norms_df = pd.DataFrame(
+        {'norm_a': norm_a, 'norm_b': norm_b}, index=fields_to_use
+    )
+    norms_df.index.name = 'field'
+    norms_df.to_csv(norms_path)
+
 if __name__=="__main__":
-    if (len(sys.argv) != 2):
-        exit_with_print(1, f"Usage: {sys.argv[0]} <path/to/csv>")
+    if (len(sys.argv) != 2 and len(sys.argv) != 4):
+        exit_with_print(
+            1,
+            f"Usage: {sys.argv[0]} <path/to/csv> "\
+            "[<path/to/thetas_out.csv> <path/to/norms_out.csv>]"
+        )
+    if (len(sys.argv) == 4):
+        thetas_path = sys.argv[2]
+        norms_path = sys.argv[3]
+    else:
+        thetas_path = 'thetas.csv'
+        norms_path = 'norms.csv'
     try:
         df = read_or_raise(sys.argv[1])
         train_with(df, [
@@ -137,7 +170,9 @@ if __name__=="__main__":
             "Slytherin",
             "Gryffindor",
             "Hufflepuff",
-        ])
+        ],
+        thetas_path,
+        norms_path)
     except Exception as exc:
         raise exc
         exit_by_exception(exc, sys.argv[1])
