@@ -45,13 +45,22 @@ def get_verdict(rp, houses, m):
     ]
     return res
 
-def predict_with(df, thetas_df, norms_df, fields_to_use, houses):
+def predict_with(
+        df,
+        thetas_df,
+        norms_df,
+        fields_to_use,
+        houses,
+        output_path='houses.csv'):
     thetas_df = thetas_df.set_index('House')
     norms_df = norms_df.set_index('field')
 
     cols = df[fields_to_use]
     nans, cols_denanned = anti_nan_multiple(cols)
-    cols_normalized = normalizer_when_normalization_is_known(cols_denanned, norms_df)
+    cols_normalized = normalizer_when_normalization_is_known(
+        cols_denanned,
+        norms_df
+    )
     cols_normalized.insert(0, 'x0', 1)
     m = ft_count(cols_normalized['x0'])
     resulting_predictions = {}
@@ -63,9 +72,19 @@ def predict_with(df, thetas_df, norms_df, fields_to_use, houses):
     final_verdict = get_verdict(df_rp, houses, m)
     print(final_verdict)
 
+    final_verdict[['Hogwarts House']].to_csv(output_path, index_label='Index')
+
 if __name__=="__main__":
-    if (len(sys.argv) != 4):
-        exit_with_print(1, f"Usage: {sys.argv[0]} <path/to/csv> <path/to/thetas.csv> <path/to/norms.csv>")
+    if (len(sys.argv) != 4 and len(sys.argv) != 5):
+        exit_with_print(
+            1,
+            f"Usage: {sys.argv[0]} <path/to/csv> <path/to/thetas.csv> "\
+            "<path/to/norms.csv> [<path/to/houses_out.csv>]"
+        )
+    if (len(sys.argv) == 5):
+        output_path = sys.argv[4]
+    else:
+        output_path = 'houses.csv'
     try:
         df = read_or_raise(sys.argv[1])
         thetas_df = read_or_raise(sys.argv[2])
@@ -74,20 +93,26 @@ if __name__=="__main__":
         # that is to say, logreg_train should write the used subjects
         #down into a used_subjects.csv or something.
         # same with houses I think?
-        predict_with(df, thetas_df, norms_df, [
-            "Astronomy",
-            "Divination",
-            "History of Magic",
-#            "Muggle Studies",
-            "Charms",
-            "Ancient Runes",
-        ],
-        [
-            "Ravenclaw",
-            "Slytherin",
-            "Gryffindor",
-            "Hufflepuff",
-        ])
+        predict_with(
+            df,
+            thetas_df,
+            norms_df,
+            [
+                "Astronomy",
+                "Divination",
+                "History of Magic",
+#                "Muggle Studies",
+                "Charms",
+                "Ancient Runes",
+            ],
+            [
+                "Ravenclaw",
+                "Slytherin",
+                "Gryffindor",
+                "Hufflepuff",
+            ],
+            output_path
+        )
     except Exception as exc:
         raise exc
         exit_by_exception(exc, sys.argv[1])
