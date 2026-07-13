@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import sys
 
-from utils.csv_reading import read_or_raise
+from utils.csv_reading import read_or_raise, read_subjects_or_raise
 import utils.additional_exceptions
 from utils.additional_utils import (
     exit_with_print,
@@ -75,7 +75,7 @@ def run_singular_logreg(y_and_x, m):
     J_now, hs_cached = J(theta, m, y, x, hs_cached)
     J_old = J_now * 10
     i = 0
-    while (abs(J_old - J_now) > 1e-6 and i < 10):
+    while (abs(J_old - J_now) > 1e-6 and i < 200):
         print(
             f"Iteration {i:5d}, "\
             f"J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}"
@@ -143,28 +143,37 @@ def train_with(
     norms_df.to_csv(norms_path)
 
 if __name__=="__main__":
-    if (len(sys.argv) != 2 and len(sys.argv) != 4):
+    if (len(sys.argv) not in (2, 4, 5)):
         exit_with_print(
             1,
             f"Usage: {sys.argv[0]} <path/to/csv> "\
-            "[<path/to/thetas_out.csv> <path/to/norms_out.csv>]"
+            "[<path/to/thetas_out.csv> <path/to/norms_out.csv> "\
+            "[<path/to/subjects.subjects>]]"
         )
-    if (len(sys.argv) == 4):
+    if (len(sys.argv) >= 4):
         thetas_path = sys.argv[2]
         norms_path = sys.argv[3]
     else:
         thetas_path = 'thetas.csv'
         norms_path = 'norms.csv'
+    if (len(sys.argv) == 5):
+        subjects_path = sys.argv[4]
+    else:
+        subjects_path = None
     try:
         df = read_or_raise(sys.argv[1])
-        train_with(df, [
-            "Astronomy",
-            "Divination",
-            "History of Magic",
-#            "Muggle Studies",
-            "Charms",
-            "Ancient Runes",
-        ],
+        if (subjects_path is not None):
+            fields_to_use = read_subjects_or_raise(subjects_path)
+        else:
+            fields_to_use = [
+                "Astronomy",
+                "Divination",
+                "History of Magic",
+#                "Muggle Studies",
+                "Charms",
+                "Ancient Runes",
+            ]
+        train_with(df, fields_to_use,
         [
             "Ravenclaw",
             "Slytherin",

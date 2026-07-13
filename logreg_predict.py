@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import sys
 
-from utils.csv_reading import read_or_raise
+from utils.csv_reading import read_or_raise, read_subjects_or_raise
 import utils.additional_exceptions
 from utils.additional_utils import (
     exit_with_print,
@@ -75,36 +75,41 @@ def predict_with(
     final_verdict[['Hogwarts House']].to_csv(output_path, index_label='Index')
 
 if __name__=="__main__":
-    if (len(sys.argv) != 4 and len(sys.argv) != 5):
+    if (len(sys.argv) not in (4, 5, 6)):
         exit_with_print(
             1,
             f"Usage: {sys.argv[0]} <path/to/csv> <path/to/thetas.csv> "\
-            "<path/to/norms.csv> [<path/to/houses_out.csv>]"
+            "<path/to/norms.csv> [<path/to/houses_out.csv> "\
+            "[<path/to/subjects.subjects>]]"
         )
-    if (len(sys.argv) == 5):
+    if (len(sys.argv) >= 5):
         output_path = sys.argv[4]
     else:
         output_path = 'houses.csv'
+    if (len(sys.argv) == 6):
+        subjects_path = sys.argv[5]
+    else:
+        subjects_path = None
     try:
         df = read_or_raise(sys.argv[1])
         thetas_df = read_or_raise(sys.argv[2])
         norms_df = read_or_raise(sys.argv[3])
-        # TODO this should accept the subjects from a file.
-        # that is to say, logreg_train should write the used subjects
-        #down into a used_subjects.csv or something.
-        # same with houses I think?
-        predict_with(
-            df,
-            thetas_df,
-            norms_df,
-            [
+        if (subjects_path is not None):
+            fields_to_use = read_subjects_or_raise(subjects_path)
+        else:
+            fields_to_use = [
                 "Astronomy",
                 "Divination",
                 "History of Magic",
 #                "Muggle Studies",
                 "Charms",
                 "Ancient Runes",
-            ],
+            ]
+        predict_with(
+            df,
+            thetas_df,
+            norms_df,
+            fields_to_use,
             [
                 "Ravenclaw",
                 "Slytherin",
