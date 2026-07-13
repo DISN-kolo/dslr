@@ -74,6 +74,12 @@ def predict_with(
 
     final_verdict[['Hogwarts House']].to_csv(output_path, index_label='Index')
 
+    original_index_verdict = final_verdict[['Hogwarts House']].copy()
+    original_index_verdict.index = cols_normalized.index
+    original_index_verdict.to_csv(
+        output_path + '.original_index', index_label='Index'
+    )
+
 if __name__=="__main__":
     if (len(sys.argv) not in (4, 5, 6)):
         exit_with_print(
