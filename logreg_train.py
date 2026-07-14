@@ -23,7 +23,7 @@ def J(theta, m, y, x, hs_cached):
                 + (1.0 - y.iloc[i])*np.log(1.0 - h_cached)
             ) / m
         )
-    return res, hs_cached
+    return -res, hs_cached
 
 def g(z):
     return 1.0 / (1.0 + np.exp(-z))
