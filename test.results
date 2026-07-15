@@ -1,0 +1,13 @@
+{'Ravenclaw': np.array([-1.38802496, -1.54994402,  0.39736225,  0.35403733,  2.25893113, 1.58301215]),
+'Slytherin': np.array([-1.52484785, -1.32176275, -2.44723171,  0.22813242, -0.87747906, -0.82311417]),
+'Gryffindor': np.array([-1.53354907,  0.96558933,  0.0927625 , -2.17480731, -1.26207049, 1.45867707]),
+'Hufflepuff': np.array([-1.42420807,  2.11983912,  0.79517634,  1.09124969,  0.20470371, -1.9960594])}
+
+made with:
+	"Astronomy",
+	"Divination",
+	"History of Magic",
+	"Charms",
+	"Ancient Runes",
+
+the first row is x0, i.e. "1", or the intercept

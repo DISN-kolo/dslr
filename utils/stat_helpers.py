@@ -128,7 +128,7 @@ def ft_percentile(s_it, ctr: int, mi: float, ma: float, p: float):
         p_ctr += 1
     return p_elem
 
-def anti_nan(it):
+def just_get_nans(it):
     if (it is None):
         raise ItsNoneError
 
@@ -138,5 +138,53 @@ def anti_nan(it):
         if (math.isnan(element)):
             nan_positions.append(old_index)
         old_index += 1
+    return nan_positions
+
+def anti_nan(it):
+    nan_positions = just_get_nans(it)
     it = it.drop(index=nan_positions)
     return nan_positions, it
+
+def just_get_nans_multiple(it):
+    if (it is None):
+        raise ItsNoneError
+    all_nanned_stuff = set()
+    for col in it:
+        local_nans = just_get_nans(it[col])
+        all_nanned_stuff = all_nanned_stuff.union(set(local_nans))
+    return all_nanned_stuff
+
+def anti_nan_multiple(it):
+    nan_positions = just_get_nans_multiple(it)
+    it = it.drop(index=nan_positions)
+    return nan_positions, it
+
+def normalize_all(df):
+    if (df is None):
+        raise ItsNoneError
+    norm_a = []
+    norm_b = []
+    for col in df:
+        one_max = ft_max(df[col])
+        one_min = ft_min(df[col])
+
+        abs_difference = abs(one_max - one_min)
+        # [-1..1] 'normalization' seems to help converge a bit faster
+        b = one_min + abs_difference / 2
+#        b = one_min
+        df[col] -= b
+
+
+        # I don't wanna do division if our numbers are all just more or
+        #less 0 + some shift (b).
+        if (abs_difference > 1e-13):
+#            df[col] /= abs_difference
+#            a = abs_difference
+            df[col] /= 0.5*abs_difference
+            a = 0.5*abs_difference
+        else:
+            a = 1
+        norm_a.append(a)
+        norm_b.append(b)
+    print(df)
+    return df, norm_a, norm_b

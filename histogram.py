@@ -23,19 +23,11 @@ def calc_dimensions(df, unquantifiable):
     y_dim = math.ceil(subj_ctr/x_dim)
     return x_dim, y_dim
 
-# breaks down the column data by houses
-def set_up_plots(
-        plots,
-        houses,
-        g_ctr,
-        x_dim,
-        y_dim,
-        final_grouping,
-        col):
+def draw_hist(plot, houses, final_grouping):
     ctr = 0
     houses_hatching = "-/\\|"
     for entry in houses:
-        plots[g_ctr % x_dim, g_ctr // x_dim].hist(
+        plot.hist(
             final_grouping.get_group(entry),
             alpha=0.5,
             color=(
@@ -47,7 +39,19 @@ def set_up_plots(
             label=entry
         )
         ctr += 1
-    plots[g_ctr % x_dim, g_ctr // x_dim].set_title(col)
+
+# breaks down the column data by houses
+def set_up_plots(
+        plots,
+        houses,
+        g_ctr,
+        x_dim,
+        y_dim,
+        final_grouping,
+        col):
+    plot = plots[g_ctr % x_dim, g_ctr // x_dim]
+    draw_hist(plot, houses, final_grouping)
+    plot.set_title(col)
 #
 # (example + generalization)
 # x_dim = 4, y_dim = 3
@@ -101,18 +105,19 @@ if __name__=="__main__":
     try:
         df = read_or_raise(sys.argv[1])
         draw_histograms_except(df, [
-            "Index",
-            "Hogwarts House",
-            "First Name",
-            "Last Name",
-            "Birthday",
-            "Best Hand",
-        ],
-        [
-            "Ravenclaw",
-            "Slytherin",
-            "Gryffindor",
-            "Hufflepuff",
-        ])
+                "Index",
+                "Hogwarts House",
+                "First Name",
+                "Last Name",
+                "Birthday",
+                "Best Hand",
+            ],
+            [
+                "Ravenclaw",
+                "Slytherin",
+                "Gryffindor",
+                "Hufflepuff",
+            ]
+        )
     except Exception as exc:
         exit_by_exception(exc, sys.argv[1])
