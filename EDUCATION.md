@@ -48,6 +48,44 @@ My answer: "Ancient Runes", "Divination" and "Astronomy" seem to go pretty well 
 
 Alright, we've arrived at something much more interesting.
 
-In this part, we train our prediction model. We do it based on the assumption that subject scores can be put in a function which would result in a 0 or 1 answer for whether or not a person with said scores belongs to a chosen house. Thus, for every house we need to do separate training sessions. Okay, and what does each session contain? 
+In this part, we train our prediction model. We do it based on the assumption that subject scores can be put in a function which would result in a 0 or 1 answer for whether or not a person with said scores belongs to a chosen house. Thus, for every house we need to do a separate training session. Okay, and what does each session contain? 
+
+$$
+J(\theta) = -\frac{1}{m}\sum_{i=1}^{m} \left[y^{(i)}\log(h_\theta(x^{(i)})) + (1-y^{(i)})\log(1-h_\theta(x^{(i)}))\right]
+$$
+
+This is our loss function - it describes how badly we've missed the training data with our estimations. The $m$ is the amount of entries, the $y^{(i)}$ is the i-th real result (which in training data is either strictly 0 or 1, indicating whether the data point belongs to a chosen house or not), the $h_\theta(x)$ is the estimation of the logistic function that we're trying to find the best set of coefficients $\theta$ for, and the $x^{(i)}$ is the i-th vector of inputs, which consists of the chosen subjects' scores, with a $1$ at the front to account for the intercept coefficient.
+
+$$
+h_\theta(x) = g(\theta^T x)
+$$
+
+Since both $\theta$ and $x$ are vectors, this way we ensure $g$ accepts the dot product, which expands to (remembering $x_0$ is always $= 1$):
+
+$$
+\theta_0 + \theta_1x^{(i)}_1 + \theta_2x^{(i)}_2 ...
+$$
+
+And of course, the logistic function itself:
+
+$$
+g(z) = \frac{1}{1+e^{-z}}
+$$
+
+Now that we're done describing the setup, let's take a look at the prediction. We shall use gradient descent for this.
+
+The loss function gives us the following partial derivative:
+
+$$
+\frac{\partial}{\partial \theta_j} J(\theta) = \frac{1}{m}\sum_{i=1}^{m} \left(h_\theta(x^{(i)}) - y^{(i)}\right)x_j^{(i)}
+$$
+
+Since we need to minimize loss, we can move to the direction of negative gradient, i.e. towards a local decline. This is a typical step:
+
+$$
+\theta := \theta - \eta\nabla J(\theta)
+$$
+
+Where $\nabla J(\theta)$ is the gradient of $J$ at point $\theta$; we get it by creating a vector of all the partial deriviatives from before and substituting the current thetas inside. This basically gives us a direction which looks at the decrease in the function. To move along it but not overshoot, we take an $\eta$ part of it, which is tyically around $0.0..1.0$, $0.1$ in our case. We continue this til the $J$ stops decreasing significantly or we reach a certain number of iterations.
 
 ### Logistic regression: Prediction
