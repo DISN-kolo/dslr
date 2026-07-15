@@ -61,10 +61,14 @@ def set_up_plots(
     draw_scatter_plot(plot, houses, final_grouping)
     plot.set_title(f"{field_x} vs {field_y}")
 
-def draw_scatterplots_of(df, fields_to_draw, houses):
+def draw_scatterplots_except(df, unquantifiable, houses):
     if (df is None):
         raise DfNoneError
     all_houses = df["Hogwarts House"]
+    fields_to_draw_proto = list(df)
+    fields_to_draw = [
+        item for item in fields_to_draw_proto if (item not in unquantifiable)
+    ]
     x_dim, y_dim = calc_dimensions(fields_to_draw)
     fig, plots = plt.subplots(x_dim, y_dim)
     g_ctr = 0
@@ -101,13 +105,13 @@ if __name__=="__main__":
         exit_with_print(1, f"Usage: {sys.argv[0]} <path/to/csv>")
     try:
         df = read_or_raise(sys.argv[1])
-        draw_scatterplots_of(df, [
-                "Astronomy",
-                "Divination",
-                "History of Magic",
-                "Muggle Studies",
-                "Charms",
-                "Ancient Runes",
+        draw_scatterplots_except(df, [
+                "Index",
+                "Hogwarts House",
+                "First Name",
+                "Last Name",
+                "Birthday",
+                "Best Hand",
             ],
             [
                 "Ravenclaw",
