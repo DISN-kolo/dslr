@@ -26,6 +26,8 @@ For describing the data, use `./describe.py <datapath.csv>`.
 
 You can build a histogram collection of subject scores by using `./histogram.py <datapath.csv>`.
 
+You can build a scatter plot collection of subject scores by using `./scatter_plot.py <datapath.csv>`.
+
 You can build a pairwise collection of plots using `./pair_plot.py <datapath.csv>`. Note that the subjects have been hand-picked beforehand as the "most interesting" to look at based on the author's opinion.
 
 ### Predicting the data
