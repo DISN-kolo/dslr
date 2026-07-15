@@ -105,18 +105,19 @@ if __name__=="__main__":
     try:
         df = read_or_raise(sys.argv[1])
         draw_histograms_except(df, [
-            "Index",
-            "Hogwarts House",
-            "First Name",
-            "Last Name",
-            "Birthday",
-            "Best Hand",
-        ],
-        [
-            "Ravenclaw",
-            "Slytherin",
-            "Gryffindor",
-            "Hufflepuff",
-        ])
+                "Index",
+                "Hogwarts House",
+                "First Name",
+                "Last Name",
+                "Birthday",
+                "Best Hand",
+            ],
+            [
+                "Ravenclaw",
+                "Slytherin",
+                "Gryffindor",
+                "Hufflepuff",
+            ]
+        )
     except Exception as exc:
         exit_by_exception(exc, sys.argv[1])

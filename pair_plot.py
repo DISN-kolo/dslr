@@ -13,7 +13,7 @@ from utils.additional_utils import (
 )
 from utils.stat_helpers import *
 from histogram import draw_hist
-from mock_scatter_plot import draw_scatter_plot
+from scatter_plot import draw_scatter_plot
 
 def get_nans_cached(cache, data, field):
     if (field not in cache):

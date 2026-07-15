@@ -183,5 +183,4 @@ if __name__=="__main__":
         thetas_path,
         norms_path)
     except Exception as exc:
-        raise exc
         exit_by_exception(exc, sys.argv[1])
