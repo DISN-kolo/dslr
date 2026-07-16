@@ -46,21 +46,23 @@ My answer: "Ancient Runes", "Divination" and "Astronomy" seem to go pretty well 
 
 ### Logistic regression: Training
 
+*Program used: `logreg_train.py`*
+
 Alright, we've arrived at something much more interesting.
 
-In this part, we train our prediction model. We do it based on the assumption that subject scores can be put in a function which would result in a 0 or 1 answer for whether or not a person with said scores belongs to a chosen house. Thus, for every house we need to do a separate training session. Okay, and what does each session contain? 
+In this part, we train our prediction model. We do it based on the assumption that certain subjects' scores can be put in a function which would result in a $0$ or $1$ answer for whether or not a person with said scores belongs to a chosen house. Thus, for every house we need to do a separate training session. Okay, and what does each session contain? 
 
 $$
 J(\theta) = -\frac{1}{m}\sum_{i=1}^{m} \left[y^{(i)}\log(h_\theta(x^{(i)})) + (1-y^{(i)})\log(1-h_\theta(x^{(i)}))\right]
 $$
 
-This is our loss function - it describes how badly we've missed the training data with our estimations. The $m$ is the amount of entries, the $y^{(i)}$ is the i-th real result (which in training data is either strictly 0 or 1, indicating whether the data point belongs to a chosen house or not), the $h_\theta(x)$ is the estimation of the logistic function that we're trying to find the best set of coefficients $\theta$ for, and the $x^{(i)}$ is the i-th vector of inputs, which consists of the chosen subjects' scores, with a $1$ at the front to account for the intercept coefficient.
+This is our loss function - it describes how badly we've missed the training data with our estimations. The $m$ is the amount of entries, the $y^{(i)}$ is the $i$-th real result (which in training data is either strictly $0$ or $1$, indicating whether the data point belongs to a chosen house or not), the $h_\theta(x)$ is the estimation of the logistic function that we're trying to find the best set of coefficients $\theta$ for, and the $x^{(i)}$ is the $i$-th vector of inputs, which consists of the chosen subjects' scores, with a $1$ at the front to account for the intercept coefficient.
 
 $$
 h_\theta(x) = g(\theta^T x)
 $$
 
-Since both $\theta$ and $x$ are vectors, this way we ensure $g$ accepts the dot product, which expands to (remembering $x_0$ is always $= 1$):
+Since both $\theta$ and $x$ are vectors, this way we ensure $g$ accepts the dot product, which expands to (remembering $x_0 \equiv 1$):
 
 $$
 \theta_0 + \theta_1x^{(i)}_1 + \theta_2x^{(i)}_2 ...
@@ -80,12 +82,18 @@ $$
 \frac{\partial}{\partial \theta_j} J(\theta) = \frac{1}{m}\sum_{i=1}^{m} \left(h_\theta(x^{(i)}) - y^{(i)}\right)x_j^{(i)}
 $$
 
-Since we need to minimize loss, we can move to the direction of negative gradient, i.e. towards a local decline. This is a typical step:
+Since we need to minimize loss, we should move in the direction of the negative gradient, i.e. towards a local decline. This is a typical step:
 
 $$
-\theta := \theta - \eta\nabla J(\theta)
+\theta := \theta - \eta \cdot \nabla J(\theta)
 $$
 
-Where $\nabla J(\theta)$ is the gradient of $J$ at point $\theta$; we get it by creating a vector of all the partial deriviatives from before and substituting the current thetas inside. This basically gives us a direction which looks at the decrease in the function. To move along it but not overshoot, we take an $\eta$ part of it, which is tyically around $0.0..1.0$, $0.1$ in our case. We continue this til the $J$ stops decreasing significantly or we reach a certain number of iterations.
+Where $\nabla J(\theta)$ is the gradient of $J$ at point $\theta$; we get it by creating a vector of all the partial deriviatives from before and substituting the current thetas inside. This basically gives us a direction which looks at the decrease in the function; a desired direction to move thetas towards in order to minimize error. To move along it but not overshoot, we take an $\eta$ part of it, which is tyically around $0.0..1.0$, $0.1$ in our case. We continue this till the $J$ stops decreasing significantly or we reach a certain number of iterations.
 
 ### Logistic regression: Prediction
+
+*Program used: `logreg_predict.py`*
+
+Having successfully found the $\theta$ where the error decrease is low enough to be considered sufficiently minimized, we plug the test data in as our $x$ vector into the $h_\theta$ function (not forgetting the additional $x_0 \equiv 1$). Of course, the data has to be normalized beforehand using the same normalization coefficients from before, and since during the prediction stage we only used the subjects that looked good enough to be useful (determined at the visualization stage) we have to rely on only these subjects' data here as well.
+
+The result is a probability between $0$ and $1$. Doing this for all four houses available, we take the house with the highest probability - this is the result of our prediction, as in "the most likely house to be assigned to for a student with said grades".
