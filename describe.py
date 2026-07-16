@@ -31,8 +31,9 @@ def describe_necessary_cols(df, unquantifiable):
         if (col in unquantifiable):
             continue
         final_table["Names"].append(col)
-        col_data = df[col].copy().to_numpy()
+        col_data = df[col].copy()
         nanned_stuff, col_data = anti_nan(col_data)
+        col_data = col_data.to_numpy()
         count = ft_count(col_data)
         mean = ft_mean(col_data, count)
         std = ft_std(col_data, count, mean)

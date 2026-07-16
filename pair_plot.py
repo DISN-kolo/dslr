@@ -56,19 +56,16 @@ def draw_pairplots_of(
 
     index_y = 0
     for field_y in fields_to_draw:
-        print(f"   entered y: {index_y:3d}: {field_y:20}")
         nanned_stuff_y = get_nans_cached(all_nans, df, field_y)
 
         index_x = 0
         for field_x in fields_to_draw:
-            print(f" entered x: {index_x:3d}: {field_x:20}")
             if (field_x == field_y):
                 local_houses = all_houses.copy().drop(index=nanned_stuff_y)
 
                 col_data = df[field_y].drop(index=nanned_stuff_y)
                 final_grouping = col_data.groupby(local_houses)
 
-                print("histogram draw called")
                 draw_hist(
                     plots[index_y, index_x],
                     houses,
@@ -84,7 +81,6 @@ def draw_pairplots_of(
             local_houses = all_houses.copy().drop(index=nanned_stuff_xy)
 
             final_grouping = current_pair.groupby(local_houses)
-            print("scatter draw called")
             draw_scatter_plot(
                 plots[index_y, index_x],
                 houses,
