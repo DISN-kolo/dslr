@@ -20,11 +20,8 @@ def normalizer_when_normalization_is_known(cols, norms_df):
         cols[col] /= norms_df.loc[col, 'norm_a']
     return cols
 
-def predict_one(theta, df, m):
-    res = np.zeros(m)
-    for i in range(m):
-        res[i] = h(theta, df.iloc[i])
-    return res
+def predict_one(theta, df):
+    return h(theta, df.to_numpy(dtype=float))
 
 def helper_func(it):
     res_index = 0
@@ -37,7 +34,7 @@ def helper_func(it):
         index += 1
     return res_index
 
-def get_verdict(rp, houses, m):
+def get_verdict(rp, houses):
     res = rp
     res['Hogwarts House index'] = res.apply(helper_func, axis=1)
     res['Hogwarts House'] = np.array(houses)[
@@ -62,14 +59,13 @@ def predict_with(
         norms_df
     )
     cols_normalized.insert(0, 'x0', 1)
-    m = ft_count(cols_normalized['x0'])
     resulting_predictions = {}
     for house in houses:
         theta = thetas_df.loc[house].to_numpy()
-        local_array = predict_one(theta, cols_normalized, m)
+        local_array = predict_one(theta, cols_normalized)
         resulting_predictions[house] = local_array
     df_rp = pd.DataFrame(resulting_predictions)
-    final_verdict = get_verdict(df_rp, houses, m)
+    final_verdict = get_verdict(df_rp, houses)
     print(final_verdict)
 
     final_verdict[['Hogwarts House']].to_csv(output_path, index_label='Index')

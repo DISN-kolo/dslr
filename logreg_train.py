@@ -12,35 +12,23 @@ from utils.additional_utils import (
 )
 from utils.stat_helpers import *
 
-def J(theta, m, y, x, hs_cached):
-    res = 0
-    for i in range(m):
-        h_cached = h(theta, x.iloc[i])
-        hs_cached[i] = h_cached
-        res += (
-            (
-                y.iloc[i] * np.log(h_cached)
-                + (1.0 - y.iloc[i])*np.log(1.0 - h_cached)
-            ) / m
-        )
+def J(theta, m, y, x):
+    hs_cached = h(theta, x)
+    res = np.sum(
+        y * np.log(hs_cached) + (1.0 - y) * np.log(1.0 - hs_cached)
+    ) / m
     return -res, hs_cached
 
 def g(z):
     return 1.0 / (1.0 + np.exp(-z))
 
+# x can be a single row (n,) -> scalar, or a full (m, n) matrix -> (m,)
 def h(theta, x):
-    return g(np.dot(theta, x))
+    return g(x @ theta)
 
-# per-axis. 
-def dJ_dtheta(hs_cached, y, xj, m):
-    res = 0
-    for i in range(m):
-        res += (
-            (hs_cached[i] - y.iloc[i]
-            )
-            * xj.iloc[i] / m
-        )
-    return res
+# all thetas at once, via a single matrix pass over the data.
+def dJ_dtheta(hs_cached, y, x, m):
+    return (x.T @ (hs_cached - y)) / m
 
 # returns what is basically
 # { "House_name": df(index: does_it_belong_to_House_name), .. }
@@ -67,27 +55,22 @@ def join_houses_and_cols(house_labels, cols):
 # x_i is the vector of subject scores.
 def run_singular_logreg(y_and_x, m):
     eta = 0.1
-    hs_cached = np.zeros(m)
-    y = y_and_x.iloc[:, 0]
-    x = y_and_x.iloc[:, 1:]
-    theta = np.array([0.0 for column in x])
-    dJ = np.array([0.0 for column in x])
-    J_now, hs_cached = J(theta, m, y, x, hs_cached)
+    y = y_and_x.iloc[:, 0].to_numpy(dtype=float)
+    x = y_and_x.iloc[:, 1:].to_numpy(dtype=float)
+    theta = np.zeros(x.shape[1])
+    J_now, hs_cached = J(theta, m, y, x)
     J_old = J_now * 10
     i = 0
-    while (abs(J_old - J_now) > 1e-6 and i < 200):
+    while (abs(J_old - J_now) > 1e-6 and i < 2000):
         print(
             f"Iteration {i:5d}, "\
             f"J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}"
         )
-        j = 0
-        for col in x:
-            dJ[j] = dJ_dtheta(hs_cached, y, x[col], m)
-            j += 1
+        dJ = dJ_dtheta(hs_cached, y, x, m)
         theta = theta - eta * dJ
 #        print("theta now:", theta)
         J_old = J_now
-        J_now, hs_cached = J(theta, m, y, x, hs_cached)
+        J_now, hs_cached = J(theta, m, y, x)
         i += 1
     print(
         f"after quiting on {i:5d}, "\
