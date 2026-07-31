@@ -58,6 +58,7 @@ def run_singular_logreg(y_and_x, m):
     y = y_and_x.iloc[:, 0].to_numpy(dtype=float)
     x = y_and_x.iloc[:, 1:].to_numpy(dtype=float)
     theta = np.zeros(x.shape[1])
+    print(theta)
     J_now, hs_cached = J(theta, m, y, x)
     J_old = J_now * 10
     i = 0
@@ -73,7 +74,7 @@ def run_singular_logreg(y_and_x, m):
         J_now, hs_cached = J(theta, m, y, x)
         i += 1
     print(
-        f"after quiting on {i:5d}, "\
+        f"after quitting on {i:5d}, "\
         f"J_now: {J_now:16.10g}, diff: {abs(J_old - J_now):16.10g}"
     )
     print("==========================\n\n")
